@@ -1,0 +1,49 @@
+---
+- name: Launch EC2 instance and add to Ansible inventory
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    key_name: psp_ansible_key
+    key_path: "{{ lookup('env', 'HOME') }}/.ssh/{{ key_name }}"
+    region: eu-west-2
+    image_id: ami-0be057a22c63962cb    # Ubuntu 22.04 (check if still available)
+    instance_type: t2.micro
+    security_group: launch-wizard-1
+    vpc_subnet_id: subnet-02a17e56e6827124a   # 🔁 Replace with your own subnet ID
+    instance_tag_name: TestServer
+    ansible_inventory_path: "{{ lookup('env', 'HOME') }}/ansible_hosts"
+
+  tasks:
+    - name: Upload SSH public key to AWS
+      amazon.aws.ec2_key:
+        name: "{{ key_name }}"
+        key_material: "{{ lookup('file', key_path + '.pub') }}"
+        region: "{{ region }}"
+
+    - name: Launch EC2 instance
+      amazon.aws.ec2_instance:
+        name: "{{ instance_tag_name }}"
+        key_name: "{{ key_name }}"
+        instance_type: "{{ instance_type }}"
+        image_id: "{{ image_id }}"
+        region: "{{ region }}"
+        wait: true
+        vpc_subnet_id: "{{ vpc_subnet_id }}"
+        network:
+          assign_public_ip: true
+          security_groups: [ "{{ security_group }}" ]
+        tags:
+          Name: "{{ instance_tag_name }}"
+      register: ec2
+
+    - name: Add instance IPs to ansible inventory under [tstlaunched]
+      blockinfile:
+        path: "{{ ansible_inventory_path }}"
+        block: |
+          [tstlaunched]
+          {% for item in ec2.instances %}
+          {{ item.public_ip_address }} ansible_user=ubuntu ansible_ssh_private_key_file={{ key_path }}
+          {% endfor %}
+        marker: "# {mark} ANSIBLE EC2 TEST HOSTS"

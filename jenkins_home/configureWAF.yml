@@ -1,0 +1,56 @@
+---
+- name: Configure WAF container on remote instance
+  hosts: tstlaunched
+  become: true
+  remote_user: ubuntu
+  gather_facts: true
+
+  vars:
+    waf_container_name: modsecurity_waf
+    waf_image: owasp/modsecurity-crs
+    proxy_target_port: 10007
+    proxy_paranoia: "2"
+
+  tasks:
+    - name: Install Docker and dependencies
+      apt:
+        name: 
+          - docker.io
+          - python3-pip
+        state: present
+        update_cache: true
+
+    - name: Install Docker SDK for Python (Ansible dependency)
+      pip:
+        name: docker
+        executable: pip3
+
+    - name: Start Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Pull the WAF Docker image
+      community.docker.docker_image:
+        name: "{{ waf_image }}"
+        source: pull
+
+    - name: Run ModSecurity WAF container
+      community.docker.docker_container:
+        name: "{{ waf_container_name }}"
+        image: "{{ waf_image }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "80:80"
+        env:
+          PARANOIA: "{{ proxy_paranoia }}"
+          PROXY: "1"
+          PROXYLOCATION: "http://{{ ansible_default_ipv4.address }}:{{ proxy_target_port }}/"
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost/"]
+          interval: 30s
+          retries: 3
+          start_period: 10s
+          timeout: 5s

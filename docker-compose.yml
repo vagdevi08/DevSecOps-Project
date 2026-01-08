@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  jenkins-master:
+    build:
+      context: ./jenkins
+    container_name: jenkins-master
+    restart: always
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock  # Needed if Jenkins runs Docker commands
+    environment:
+      Jenkins_PW: "${Jenkins_PW:-admin123}"
+      JAVA_OPTS: "${JAVA_OPTS:--Xmx1024m}"
+      JenkinsPublicHostname: "${JenkinsPublicHostname:-localhost}"
+      SeleniumPrivateIp: "${SeleniumPrivateIp:-selenium-chrome}"
+
+  selenium-chrome:
+    image: selenium/standalone-chrome
+    container_name: selenium-chrome
+    restart: always
+    ports:
+      - "4444:4444"
+    shm_size: 2gb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

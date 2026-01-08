@@ -1,0 +1,48 @@
+---
+- name: Configure test environment on remote EC2 instances
+  hosts: tstlaunched
+  become: true
+  remote_user: ubuntu
+  gather_facts: true
+
+  vars:
+    app_tarball: /home/ubuntu/pythonapp.tar.gz
+    app_directory: /home/ubuntu/gossip-world
+
+  tasks:
+    - name: Update package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name: 
+          - docker.io
+          - docker-compose
+          - kbtin
+          - make
+        state: present
+
+    - name: Ensure Docker service is running
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Copy the Python app tarball
+      copy:
+        src: pythonapp.tar.gz
+        dest: "{{ app_tarball }}"
+        mode: '0644'
+
+    - name: Extract the tarball
+      unarchive:
+        src: "{{ app_tarball }}"
+        dest: /home/ubuntu/
+        remote_src: yes
+
+    - name: Run the application using Makefile
+      make:
+        chdir: "{{ app_directory }}"
+        target: install

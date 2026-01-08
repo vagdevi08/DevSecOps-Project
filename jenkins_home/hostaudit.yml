@@ -1,0 +1,74 @@
+---
+- name: Run Lynis host audit and fetch reports
+  hosts: tstlaunched
+  become: true
+  remote_user: ubuntu
+  gather_facts: false
+
+  vars:
+    lynis_version: 3.0.9
+    lynis_url: "https://downloads.cisofy.com/lynis/lynis-{{ lynis_version }}.tar.gz"
+    lynis_extract_path: /home/ubuntu/lynis
+    lynis_archive_path: "/tmp/lynis-{{ lynis_version }}.tar.gz"
+    report_html: "{{ lynis_extract_path }}/host_audit_report.html"
+    logfolder: "{{ playbook_dir }}/audit_logs"
+
+  tasks:
+    - name: Ensure destination folders exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ lynis_extract_path }}"
+        - "{{ logfolder }}"
+
+    - name: Download Lynis archive
+      get_url:
+        url: "{{ lynis_url }}"
+        dest: "{{ lynis_archive_path }}"
+        mode: '0644'
+
+    - name: Extract Lynis
+      unarchive:
+        src: "{{ lynis_archive_path }}"
+        dest: "{{ lynis_extract_path | dirname }}"
+        remote_src: true
+
+    - name: Install ansi2html for HTML conversion
+      apt:
+        name: ansi2html
+        state: present
+        update_cache: true
+
+    - name: Run Lynis system audit and generate HTML report
+      shell: ./lynis audit system --quick --auditor "The Auditor" | ansi2html > host_audit_report.html
+      args:
+        chdir: "{{ lynis_extract_path }}"
+
+    - name: Fetch Lynis log
+      fetch:
+        src: /var/log/lynis.log
+        dest: "{{ logfolder }}"
+        flat: true
+
+    - name: Fetch Lynis raw report
+      fetch:
+        src: /var/log/lynis-report.dat
+        dest: "{{ logfolder }}"
+        flat: true
+
+    - name: Fetch HTML-formatted audit report
+      fetch:
+        src: "{{ report_html }}"
+        dest: "{{ logfolder }}"
+        flat: true
+
+    - name: Cleanup report files on remote host
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ report_html }}"
+        - /var/log/lynis.log
+        - /var/log/lynis-report.dat

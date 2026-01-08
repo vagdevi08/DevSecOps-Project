@@ -1,0 +1,30 @@
+---
+- name: Terminate EC2 instance(s)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    region: "eu-west-2"
+    instance_tag: "TestServer"  # Tag used during creation
+    instance_state: "running"   # Only target running ones
+
+  tasks:
+    - name: Find EC2 instance(s) with tag Name=TestServer
+      amazon.aws.ec2_instance_info:
+        region: "{{ region }}"
+        filters:
+          "tag:Name": "{{ instance_tag }}"
+          instance-state-name: "{{ instance_state }}"
+      register: ec2_info
+
+    - name: Show instances to be terminated
+      debug:
+        msg: "Found instance(s): {{ ec2_info.instances | map(attribute='instance_id') | list }}"
+
+    - name: Terminate found EC2 instance(s)
+      amazon.aws.ec2_instance:
+        region: "{{ region }}"
+        instance_ids: "{{ ec2_info.instances | map(attribute='instance_id') | list }}"
+        state: absent
+      when: ec2_info.instances | length > 0

@@ -73,7 +73,7 @@ pipeline {
           def lynisDir = '/var/jenkins_home/lynis'
           if (!fileExists("${lynisDir}/lynis")) {
             sh """
-              wget https://downloads.cisofy.com/lynis/lynis-3.0.9.tar.gz -O /tmp/lynis.tar.gz
+              sh 'lynis audit dockerfile'
               mkdir -p ${lynisDir}
               tar xfvz /tmp/lynis.tar.gz -C ${lynisDir} --strip-components=1
             """

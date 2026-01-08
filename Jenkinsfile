@@ -31,14 +31,14 @@ pipeline {
     stage('Checkout') {
       steps {
         echo 'Cloning project repo...'
-        git "${REPO_URL}"
+        git 'https://github.com/pawnu/secDevLabs.git'
       }
     }
 
     stage('Secrets Scan') {
       steps {
         echo 'Running truffleHog...'
-        sh 'trufflehog https://github.com/pawnu/secDevLabs.get --no-update'
+        sh 'trufflehog git https://github.com/pawnu/secDevLabs.git --no-update'
       }
     }
 

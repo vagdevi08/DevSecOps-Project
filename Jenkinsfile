@@ -38,7 +38,7 @@ pipeline {
     stage('Secrets Scan') {
       steps {
         echo 'Running truffleHog...'
-        sh 'trufflehog --regex --entropy=False --max_depth=3 ${REPO_URL}'
+        sh 'trufflehog https://github.com/pawnu/secDevLabs.get --no-update'
       }
     }
 

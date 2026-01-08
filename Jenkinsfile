@@ -50,7 +50,7 @@ pipeline {
         echo 'Running liccheck...'
         sh '''
           virtualenv venv
-          source venv/bin/activate
+          . venv/bin/activate
           pip install -r $REQ_FILE
           liccheck -s ~/strategy.ini -r $REQ_FILE || true
           deactivate

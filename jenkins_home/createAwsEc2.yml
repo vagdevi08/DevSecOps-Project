@@ -7,11 +7,11 @@
   vars:
     key_name: psp_ansible_key
     key_path: "{{ lookup('env', 'HOME') }}/.ssh/{{ key_name }}"
-    region: eu-west-2
-    image_id: ami-0be057a22c63962cb    # Ubuntu 22.04 (check if still available)
-    instance_type: t2.micro
+    region: ap-south-1
+    image_id: ami-02b8269d5e85954ef    # Ubuntu 22.04 (check if still available)
+    instance_type: t2.medium
     security_group: launch-wizard-1
-    vpc_subnet_id: subnet-02a17e56e6827124a   # 🔁 Replace with your own subnet ID
+    vpc_subnet_id: subnet-034b4cf3cb2c84ed7   # 🔁 Replace with your own subnet ID
     instance_tag_name: TestServer
     ansible_inventory_path: "{{ lookup('env', 'HOME') }}/ansible_hosts"
 

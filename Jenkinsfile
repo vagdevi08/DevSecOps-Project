@@ -18,7 +18,7 @@ pipeline {
   agent any
 
   environment {
-    REPO_URL = 'https://github.com/pawnu/secDevLabs.git'
+    REPO_URL = 'https://github.com/vagdevi08/secDevLabs'
     REQ_FILE = 'owasp-top10-2017-apps/a7/gossip-world/app/requirements.txt'
     APP_DIR = 'owasp-top10-2017-apps/a7/gossip-world'
     DOCKERFILE_PATH = 'owasp-top10-2017-apps/a7/gossip-world/deployments/Dockerfile'

@@ -31,7 +31,7 @@ pipeline {
     stage('Checkout') {
       steps {
         echo 'Cloning project repo...'
-        git 'https://github.com/pawnu/secDevLabs.git'
+        git 'https://github.com/vagdevi08/secDevLabs.git'
       }
     }
 

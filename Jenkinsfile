@@ -79,32 +79,26 @@ pipeline {
   }
 }
 
-    stage('Provision Test Environment') {
-  steps {
-    echo 'Setting up EC2 test environment...'
-    sh '''
-      echo "[local]" > $ANSIBLE_HOSTS
-      echo "localhost ansible_connection=local" >> $ANSIBLE_HOSTS
-      echo "[tstlaunched]" >> $ANSIBLE_HOSTS
+          stage('Setup test env') {
+          steps {
+              sh """
+	      #refresh inventory
+	      echo "[local]" > ~/ansible_hosts
+	      echo "localhost ansible_connection=local" >> ~/ansible_hosts
+	      echo "[tstlaunched]" >> ~/ansible_hosts
+	      
+	      tar cvfz /var/jenkins_home/pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
 
-      tar czf $ARCHIVE_PATH -C owasp-top10-2017-apps/a7/ .
-
-      ssh-keygen -t rsa -N "" -f ~/.ssh/psp_ansible_key || true
-
-      ansible-playbook -i $ANSIBLE_HOSTS $WORKSPACE/jenkins_home/createAwsEc2.yml
-    '''
-
-    script {
-      testenv = sh(
-        script: "awk '/\\[tstlaunched\\]/{getline; print}' $ANSIBLE_HOSTS",
-        returnStdout: true
-      ).trim()
-      echo "Test environment IP: ${testenv}"
-    }
-
-    sh 'ansible-playbook -i $ANSIBLE_HOSTS $WORKSPACE/jenkins_home/configureTestEnv.yml'
-  }
-}
+              ssh-keygen -t rsa -N "" -f ~/.ssh/psp_ansible_key || true
+              ansible-playbook -i ~/ansible_hosts ~/createAwsEc2.yml
+              """		  
+	      script{
+		 testenv = sh(script: "sed -n '/tstlaunched/{n;p;}' /var/jenkins_home/ansible_hosts", returnStdout: true).trim()
+	      }
+	      echo "${testenv}"
+	      sh  'ansible-playbook -i ~/ansible_hosts ~/configureTestEnv.yml'
+          }
+      }
 
     stage('DAST (Authenticated Scan)') {
       steps {

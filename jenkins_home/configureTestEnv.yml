@@ -10,19 +10,18 @@
     app_directory: /home/ubuntu/gossip-world
 
   tasks:
+
     - name: Update package cache
       apt:
         update_cache: yes
         cache_valid_time: 3600
 
     - name: Remove conflicting containerd
-      become: yes
       apt:
         name: containerd
         state: absent
 
-    - name: Remove old docker packages
-      become: yes
+    - name: Remove old Docker packages
       apt:
         name:
           - docker
@@ -33,8 +32,22 @@
         state: absent
         purge: yes
 
+    - name: Clean APT cache and remove unused packages
+      apt:
+        autoremove: yes
+        purge: yes
+        update_cache: yes
+
+    - name: Install Docker prerequisites
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
     - name: Install required packages
-      become: yes
       apt:
         name:
           - docker.io
@@ -42,12 +55,19 @@
           - kbtin
         state: present
         update_cache: yes
+        force_apt_get: yes
 
     - name: Ensure Docker service is running
       systemd:
         name: docker
         state: started
         enabled: true
+
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
 
     - name: Copy the Python app tarball
       copy:

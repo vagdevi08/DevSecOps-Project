@@ -91,7 +91,7 @@ pipeline {
 
       ssh-keygen -t rsa -N "" -f ~/.ssh/psp_ansible_key || true
 
-      ansible-playbook -i $ANSIBLE_HOSTS $WORKSPACE/createAwsEc2.yml
+      ansible-playbook -i $ANSIBLE_HOSTS $WORKSPACE/jenkins_home/createAwsEc2.yml
     '''
 
     script {
@@ -102,7 +102,7 @@ pipeline {
       echo "Test environment IP: ${testenv}"
     }
 
-    sh 'ansible-playbook -i $ANSIBLE_HOSTS $WORKSPACE/configureTestEnv.yml'
+    sh 'ansible-playbook -i $ANSIBLE_HOSTS $WORKSPACE/jenkins_home/configureTestEnv.yml'
   }
 }
 

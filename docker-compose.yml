@@ -6,25 +6,29 @@ services:
       context: ./jenkins
     container_name: jenkins-master
     restart: always
+    user: "1000:1000"
     ports:
-      - "8080:8080"
-      - "50000:50000"
+      - "127.0.0.1:8080:8080"
     volumes:
       - ./jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock  # Needed if Jenkins runs Docker commands
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
-      Jenkins_PW: "${Jenkins_PW:-admin123}"
-      JAVA_OPTS: "${JAVA_OPTS:--Xmx1024m}"
-      JenkinsPublicHostname: "${JenkinsPublicHostname:-localhost}"
-      SeleniumPrivateIp: "${SeleniumPrivateIp:-selenium-chrome}"
+      Jenkins_PW: "${Jenkins_PW}"
+      JAVA_OPTS: "-Xmx1024m"
+      JenkinsPublicHostname: "${JenkinsPublicHostname}"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
 
   selenium-chrome:
     image: selenium/standalone-chrome
     container_name: selenium-chrome
     restart: always
-    ports:
-      - "4444:4444"
     shm_size: 2gb
+    ports:
+      - "127.0.0.1:4444:4444"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4444"]
       interval: 30s

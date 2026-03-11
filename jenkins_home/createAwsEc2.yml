@@ -8,11 +8,11 @@
     key_name: psp_ansible_key
     key_path: "{{ lookup('env', 'HOME') }}/.ssh/{{ key_name }}"
     region: ap-south-1
-    image_id: ami-02b8269d5e85954ef    # Ubuntu 22.04 (check if still available)
-    instance_type: t2.medium
-    security_group: launch-wizard-1
-    vpc_subnet_id: subnet-034b4cf3cb2c84ed7   # 🔁 Replace with your own subnet ID
-    instance_tag_name: TestServer
+    image_id: ami-019715e0d74f695be    # Ubuntu 22.04 (check if still available)
+    instance_type: t3.small
+    security_group: launch-wizard-2
+    vpc_subnet_id: subnet-0a8e5dffcd31dea3d   # 🔁 Replace with your own subnet ID
+    instance_tag_name: PythonSecurityPipeline-Server
     ansible_inventory_path: "{{ lookup('env', 'HOME') }}/ansible_hosts"
 
   tasks:
@@ -29,6 +29,7 @@
         instance_type: "{{ instance_type }}"
         image_id: "{{ image_id }}"
         region: "{{ region }}"
+        state: present
         wait: true
         vpc_subnet_id: "{{ vpc_subnet_id }}"
         network:
@@ -44,6 +45,6 @@
         block: |
           [tstlaunched]
           {% for item in ec2.instances %}
-          {{ item.public_ip_address }} ansible_user=ubuntu ansible_ssh_private_key_file={{ key_path }}
+          {{ item.public_ip_address }} ansible_user=ubuntu ansible_ssh_private_key_file={{ key_path }} ansible_python_interpreter=/usr/bin/python3
           {% endfor %}
         marker: "# {mark} ANSIBLE EC2 TEST HOSTS"

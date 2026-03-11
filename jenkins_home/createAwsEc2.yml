@@ -43,7 +43,6 @@
       blockinfile:
         path: "{{ ansible_inventory_path }}"
         block: |
-          [tstlaunched]
           {% for item in ec2.instances %}
           {{ item.public_ip_address }} ansible_user=ubuntu ansible_ssh_private_key_file={{ key_path }} ansible_python_interpreter=/usr/bin/python3
           {% endfor %}

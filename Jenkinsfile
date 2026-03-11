@@ -47,13 +47,14 @@ pipeline {
         echo 'Running safety check...'
         sh 'safety check -r $REQ_FILE || true'
 
-        echo 'Running liccheck...'
+        echo 'Checking dependency licenses...'
         sh '''
-          virtualenv venv
+          python3 -m venv venv
           . venv/bin/activate
           pip install -r $REQ_FILE
-          liccheck -s ~/strategy.ini -r $REQ_FILE || true
-          deactivate
+          pip install pip-licenses
+          pip-licenses
+	  deactivate
         '''
       }
     }

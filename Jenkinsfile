@@ -38,7 +38,7 @@ pipeline {
     stage('Secrets Scan') {
       steps {
         echo 'Running truffleHog...'
-        sh 'trufflehog git https://github.com/pawnu/secDevLabs.git --no-update'
+        sh 'trufflehog filesystem .' --no-update'
       }
     }
 

@@ -38,7 +38,7 @@ pipeline {
     stage('Secrets Scan') {
       steps {
         echo 'Running truffleHog...'
-        sh 'trufflehog filesystem .'
+        sh 'trufflehog filesystem . --no-update'
       }
     }
 

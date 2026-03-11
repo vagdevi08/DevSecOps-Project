@@ -70,6 +70,13 @@
         state: started
         enabled: true
 
+    - name: Wait for Docker daemon to be ready
+      shell: docker info
+      register: docker_ready
+      retries: 10
+      delay: 3
+      until: docker_ready.rc == 0
+
     - name: Add ubuntu user to docker group
       user:
         name: ubuntu

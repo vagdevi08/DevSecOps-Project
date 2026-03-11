@@ -38,6 +38,9 @@
         purge: yes
         update_cache: yes
 
+    - name: Unhold any held packages
+      shell: apt-mark unhold docker.io containerd containerd.io docker-compose || true
+
     - name: Install Docker prerequisites
       apt:
         name:

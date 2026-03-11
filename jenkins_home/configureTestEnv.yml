@@ -18,8 +18,11 @@
 
     - name: Remove conflicting containerd
       apt:
-        name: containerd
+        name: 
+          - containerd
+          - containerd.io
         state: absent
+        purge: yes
 
     - name: Remove old Docker packages
       apt:
@@ -28,6 +31,7 @@
           - docker-engine
           - docker.io
           - containerd
+          - containerd.io
           - runc
         state: absent
         purge: yes

@@ -80,6 +80,9 @@ pipeline {
 }
 
           stage('Setup test env') {
+          environment{
+               ANSIBLE_HOST_KEY_CHECKING="False"
+          }
           steps {
               sh """
 	      #refresh inventory

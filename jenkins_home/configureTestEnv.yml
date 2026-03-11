@@ -15,14 +15,22 @@
         update_cache: yes
         cache_valid_time: 3600
 
-    - name: Install required packages
+    - name: Remove conflicting containerd package
+      become: yes
       apt:
+        name: containerd
+        state: absent
+
+    - name: Install required packages
+      become: yes 
+     apt:
         name: 
           - docker.io
           - docker-compose
           - kbtin
           - make
         state: present
+        update_cache: yes
 
     - name: Ensure Docker service is running
       systemd:

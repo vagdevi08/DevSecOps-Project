@@ -67,30 +67,17 @@ pipeline {
     }
 
     stage('Container Security Audit') {
-      steps {
-        script {
-          echo 'Running Lynis Dockerfile audit...'
+  steps {
+    script {
+      echo 'Running Lynis Dockerfile audit...'
 
-          def lynisDir = '/var/jenkins_home/lynis'
-          if (!fileExists("${lynisDir}/lynis")) {
-            sh """
-              sh 'lynis audit dockerfile'
-              mkdir -p ${lynisDir}
-              tar xfvz /tmp/lynis.tar.gz -C ${lynisDir} --strip-components=1
-            """
-          }
-
-          dir(lynisDir) {
-            sh """
-              mkdir -p $BUILD_LOG_DIR
-              ./lynis audit dockerfile $DOCKERFILE_PATH | ansi2html > $BUILD_LOG_DIR/docker-report.html
-              mv /tmp/lynis.log $BUILD_LOG_DIR/docker_lynis.log || true
-              mv /tmp/lynis-report.dat $BUILD_LOG_DIR/docker_lynis-report.dat || true
-            """
-          }
-        }
-      }
+      sh '''
+        mkdir -p $BUILD_LOG_DIR
+        lynis audit dockerfile $DOCKERFILE_PATH | tee $BUILD_LOG_DIR/docker_lynis.log
+      '''
     }
+  }
+}
 
     stage('Provision Test Environment') {
       steps {

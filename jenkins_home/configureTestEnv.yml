@@ -15,20 +15,31 @@
         update_cache: yes
         cache_valid_time: 3600
 
-    - name: Remove conflicting containerd package
+    - name: Remove conflicting containerd
       become: yes
       apt:
         name: containerd
         state: absent
 
+    - name: Remove old docker packages
+      become: yes
+      apt:
+        name:
+          - docker
+          - docker-engine
+          - docker.io
+          - containerd
+          - runc
+        state: absent
+        purge: yes
+
     - name: Install required packages
-      become: yes 
-     apt:
-        name: 
+      become: yes
+      apt:
+        name:
           - docker.io
           - docker-compose
           - kbtin
-          - make
         state: present
         update_cache: yes
 

@@ -87,7 +87,7 @@ pipeline {
         echo "localhost ansible_connection=local" >> ~/ansible_hosts
         echo "[tstlaunched]" >> ~/ansible_hosts
         
-        tar cvfz /var/jenkins_home/pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
+        tar cvfz /var/jenkins/pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
 
         ssh-keygen -t rsa -N "" -f ~/.ssh/python-pipeline-key -q || true
 

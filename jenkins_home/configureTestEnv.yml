@@ -78,7 +78,7 @@
 
     - name: Copy the Python app tarball
       copy:
-        src: /var/jenkins_home/pythonapp.tar.gz
+        src: /var/jenkins/pythonapp.tar.gz
         dest: "{{ app_tarball }}"
         mode: '0644'
 

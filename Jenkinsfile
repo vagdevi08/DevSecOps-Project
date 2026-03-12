@@ -67,17 +67,17 @@ pipeline {
     }
 
     stage('Container Security Audit') {
-  steps {
-    script {
-      echo 'Running Lynis Dockerfile audit...'
+      steps {
+        script {
+          echo 'Running Lynis Dockerfile audit...'
 
-      sh '''
-        mkdir -p $BUILD_LOG_DIR
-        lynis audit dockerfile $DOCKERFILE_PATH | tee $BUILD_LOG_DIR/docker_lynis.log
-      '''
+          sh '''
+            mkdir -p $BUILD_LOG_DIR
+            lynis audit dockerfile $DOCKERFILE_PATH | tee $BUILD_LOG_DIR/docker_lynis.log
+          '''
+        }
+      }
     }
-  }
-}
 
           stage('Setup test env') {
           environment{
@@ -90,7 +90,7 @@ pipeline {
 	      echo "localhost ansible_connection=local" >> ~/ansible_hosts
 	      echo "[tstlaunched]" >> ~/ansible_hosts
 	      
-	      tar cvfz /var/jenkins_home/pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
+	      tar cvfz /var/jenkins/pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
 
               ssh-keygen -t rsa -N "" -f ~/.ssh/security-pipeline-key || true
               ansible-playbook -i ~/ansible_hosts /home/ubuntu/DevSecOps-Project/jenkins_home/createAwsEc2.yml

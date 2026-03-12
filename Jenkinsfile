@@ -79,28 +79,33 @@ pipeline {
       }
     }
 
-          stage('Setup test env') {
-          environment{
-               ANSIBLE_HOST_KEY_CHECKING="False"
-          }
-          steps {
-              sh """
-	      #refresh inventory
-	      echo "[local]" > ~/ansible_hosts
-	      echo "localhost ansible_connection=local" >> ~/ansible_hosts
-	      echo "[tstlaunched]" >> ~/ansible_hosts
-	      
-	      tar cvfz pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
+    stage('Setup test env') {
+    environment{
+        ANSIBLE_HOST_KEY_CHECKING="False"
+    }
+    steps {
+        sh """
+        # refresh inventory
+        echo "[local]" > ~/ansible_hosts
+        echo "localhost ansible_connection=local" >> ~/ansible_hosts
+        echo "[tstlaunched]" >> ~/ansible_hosts
+        
+        tar cvfz pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
 
-              ssh-keygen -t rsa -N "" -f ~/.ssh/security-pipeline-key || true
-              /usr/bin/ansible-playbook -i /var/lib/jenkins/ansible_hosts createAwsEc2.yml                """		  
-	      script{
-		 testenv = sh(script: "sed -n '/tstlaunched/{n;p;}' /var/jenkins_home/ansible_hosts", returnStdout: true).trim()
-	      }
-	      echo "${testenv}"
-	      sh  'ansible-playbook -i ~/ansible_hosts /home/ubuntu/DevSecOps-Project/jenkins_home/configureTestEnv.yml'
-          }
-      }
+        ssh-keygen -t rsa -N "" -f ~/.ssh/security-pipeline-key -q || true
+
+        /usr/bin/ansible-playbook -i ~/ansible_hosts /home/ubuntu/DevSecOps-Project/jenkins_home/createAwsEc2.yml
+        """		  
+
+        script{
+            testenv = sh(script: "sed -n '/tstlaunched/{n;p;}' ~/ansible_hosts", returnStdout: true).trim()
+        }
+
+        echo "${testenv}"
+
+        sh 'ansible-playbook -i ~/ansible_hosts /home/ubuntu/DevSecOps-Project/jenkins_home/configureTestEnv.yml'
+    }
+}
 
     stage('DAST (Authenticated Scan)') {
       steps {

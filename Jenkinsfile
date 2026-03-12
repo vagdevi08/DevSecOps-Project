@@ -93,8 +93,7 @@ pipeline {
 	      tar cvfz pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
 
               ssh-keygen -t rsa -N "" -f ~/.ssh/security-pipeline-key || true
-              ansible-playbook -i ~/ansible_hosts /home/ubuntu/DevSecOps-Project/jenkins_home/createAwsEc2.yml
-              """		  
+              /usr/bin/ansible-playbook -i /var/lib/jenkins/ansible_hosts createAwsEc2.yml                """		  
 	      script{
 		 testenv = sh(script: "sed -n '/tstlaunched/{n;p;}' /var/jenkins_home/ansible_hosts", returnStdout: true).trim()
 	      }

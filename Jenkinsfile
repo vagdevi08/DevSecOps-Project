@@ -154,7 +154,7 @@ stage('Static Analysis (SAST)') {
             if (env.testenv != "null") {
                 def seleniumIp = env.SeleniumPrivateIp ?: "selenium-chrome"
                 sh """
-                python ~/authDAST.py ${seleniumIp} ${env.testenv} ${BUILD_LOG_DIR}/DAST_results.html
+                python3 ~/authDAST.py ${seleniumIp} ${env.testenv} ${BUILD_LOG_DIR}/DAST_results.html
                 """
             } else {
                 error("Test environment not found!")

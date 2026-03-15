@@ -134,19 +134,32 @@ stage('Static Analysis (SAST)') {
 //     }
 // }
 
+    // stage('DAST (Authenticated Scan)') {
+    //   steps {
+    //     echo 'Running Authenticated Dynamic Scan...'
+    //     script {
+    //       if (testenv != "null") {
+    //         def seleniumIp = env.SeleniumPrivateIp ?: "selenium-chrome"
+    //         sh "python ~/authDAST.py $seleniumIp ${testenv} $BUILD_LOG_DIR/DAST_results.html"
+    //       } else {
+    //         error("Test environment not found!")
+    //       }
+    //     }
+    //   }
+    // }
     stage('DAST (Authenticated Scan)') {
-      steps {
+    steps {
         echo 'Running Authenticated Dynamic Scan...'
         script {
-          if (testenv != "null") {
-            def seleniumIp = env.SeleniumPrivateIp ?: "selenium-chrome"
-            sh "python ~/authDAST.py $seleniumIp ${testenv} $BUILD_LOG_DIR/DAST_results.html"
-          } else {
-            error("Test environment not found!")
-          }
+            if (env.testenv) {
+                def seleniumIp = env.SeleniumPrivateIp ?: "selenium-chrome"
+                sh "python ~/authDAST.py ${seleniumIp} ${env.testenv} $BUILD_LOG_DIR/DAST_results.html"
+            } else {
+                error("Test environment not found!")
+            }
         }
-      }
     }
+}
 
     stage('System Audit') {
       steps {

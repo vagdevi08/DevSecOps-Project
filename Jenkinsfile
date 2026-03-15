@@ -151,9 +151,11 @@ stage('Static Analysis (SAST)') {
     steps {
         echo 'Running Authenticated Dynamic Scan...'
         script {
-            if (env.testenv) {
+            if (env.testenv != "null") {
                 def seleniumIp = env.SeleniumPrivateIp ?: "selenium-chrome"
-                sh "python ~/authDAST.py ${seleniumIp} ${env.testenv} $BUILD_LOG_DIR/DAST_results.html"
+                sh """
+                python ~/authDAST.py ${seleniumIp} ${env.testenv} ${BUILD_LOG_DIR}/DAST_results.html
+                """
             } else {
                 error("Test environment not found!")
             }

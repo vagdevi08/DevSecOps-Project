@@ -42,30 +42,60 @@ pipeline {
       }
     }
 
-    stage('Software Composition Analysis') {
-      steps {
-        echo 'Running safety check...'
-        sh 'safety check -r $REQ_FILE || true'
+    // stage('Software Composition Analysis') {
+    //   steps {
+    //     echo 'Running safety check...'
+    //     sh 'safety check -r $REQ_FILE || true'
 
-        echo 'Checking dependency licenses...'
+    //     echo 'Checking dependency licenses...'
+    //     sh '''
+    //       python3 -m venv venv
+    //       . venv/bin/activate
+    //       pip install -r $REQ_FILE
+    //       pip install pip-licenses
+    //       pip-licenses
+	  // deactivate
+    //     '''
+    //   }
+    // }
+
+
+stage('Software Composition Analysis') {
+    steps {
         sh '''
-          python3 -m venv venv
-          . venv/bin/activate
-          pip install -r $REQ_FILE
-          pip install pip-licenses
-          pip-licenses
-	  deactivate
+        echo "Running safety and license checks..."
+
+        python3 -m venv venv
+        . venv/bin/activate
+
+        pip install safety pip-licenses
+
+        python -m safety check -r owasp-top10-2017-apps/a7/gossip-world/app/requirements.txt || true
+
+        pip install -r owasp-top10-2017-apps/a7/gossip-world/app/requirements.txt
+        pip-licenses
         '''
-      }
     }
+}
+    // stage('Static Analysis (SAST)') {
+    //   steps {
+    //     echo 'Running Bandit scan...'
+    //     sh 'bandit -r $APP_DIR -ll || true'
+    //   }
+    // }
 
-    stage('Static Analysis (SAST)') {
-      steps {
-        echo 'Running Bandit scan...'
-        sh 'bandit -r $APP_DIR -ll || true'
-      }
+stage('Static Analysis (SAST)') {
+    steps {
+        sh '''
+        echo "Running Bandit scan..."
+
+        . venv/bin/activate
+        pip install bandit
+
+        python -m bandit -r owasp-top10-2017-apps/a7/gossip-world -ll || true
+        '''
     }
-
+}
     stage('Container Security Audit') {
       steps {
         script {

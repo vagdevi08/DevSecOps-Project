@@ -45,7 +45,7 @@ stage('Move to App') {
     stage('Secrets Scan') {
       steps {
         echo 'Running truffleHog...'
-        sh 'trufflehog filesystem . --json > trufflehog_results.json '
+        sh '/usr/local/bin/trufflehog filesystem . --json > trufflehog_results.json'
       }
     }
 

@@ -45,7 +45,9 @@ stage('Move to App') {
     stage('Secrets Scan') {
       steps {
         echo 'Running truffleHog...'
+        dir('owasp-top10-2017-apps/a7/gossip-world'){
         sh 'trufflehog filesystem . --no-update'
+        }
       }
     }
 

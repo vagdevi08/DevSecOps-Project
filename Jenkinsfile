@@ -12,9 +12,7 @@ Stages:
 8. Web Application Firewall Deployment (ModSecurity)
 */
 
-environment {
-    testenv = "http://43.205.130.77:5000"
-}
+def testenv = "null"
 
 pipeline {
   agent any
@@ -149,19 +147,20 @@ stage('Static Analysis (SAST)') {
     //     }
     //   }
     // }
-stage('DAST (Authenticated Scan)') {
+    stage('DAST (Authenticated Scan)') {
     steps {
         echo 'Running Authenticated Dynamic Scan...'
         script {
             if (env.testenv != "null") {
-                def seleniumIp = "localhost"
-                sh "python3 /home/ubuntu/DevSecOps-Project/jenkins_home/authDAST.py ${seleniumIp} ${env.testenv} ${BUILD_LOG_DIR}/DAST_results.html"
+                def seleniumIp = env.SeleniumPrivateIp ?: "selenium-chrome"
+                sh "python3 /home/ubuntu/DevSecOps-Project/jenkins_home/authDAST.py ${seleniumIp} ${env.testenv} $BUILD_LOG_DIR/DAST_results.html"
             } else {
                 error("Test environment not found!")
             }
         }
     }
 }
+
     stage('System Audit') {
       steps {
         echo 'Running host audit with Lynis...'

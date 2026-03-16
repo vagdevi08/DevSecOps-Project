@@ -137,7 +137,7 @@ stage('Static Analysis (SAST)') {
 
         echo "${testenv}"
 
-        ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ~/ansible_hosts configureTestEnv.yml
+        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ~/ansible_hosts $WORKSPACE/configureTestEnv.yml"
     }
 }
 

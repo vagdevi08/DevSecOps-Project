@@ -45,7 +45,7 @@ stage('Move to App') {
     stage('Secrets Scan') {
       steps {
         echo 'Running truffleHog...'
-        sh '/usr/local/bin/trufflehog filesystem . --json > trufflehog_results.json'
+        sh 'trufflehog filesystem . --no-update'
       }
     }
 
@@ -77,7 +77,7 @@ stage('Software Composition Analysis') {
 
         pip install safety pip-licenses
 
-        python -m safety check -r owasp-top10-2017-apps/a7/gossip-world/app/requirements.txt --json > safety_results.json || true
+        python -m safety check -r owasp-top10-2017-apps/a7/gossip-world/app/requirements.txt || true
 
         pip install -r owasp-top10-2017-apps/a7/gossip-world/app/requirements.txt
         pip-licenses
@@ -99,7 +99,7 @@ stage('Static Analysis (SAST)') {
         . venv/bin/activate
         pip install bandit
 
-        python -m bandit -r owasp-top10-2017-apps/a7/gossip-world -ll . -f json -o bandit_results.json || true
+        python -m bandit -r owasp-top10-2017-apps/a7/gossip-world -ll || true
         '''
     }
 }
@@ -110,7 +110,7 @@ stage('Static Analysis (SAST)') {
 
           sh '''
             mkdir -p $BUILD_LOG_DIR
-            lynis audit dockerfile $DOCKERFILE_PATH | tee $BUILD_LOG_DIR/docker_lynis.log 
+            lynis audit dockerfile $DOCKERFILE_PATH | tee $BUILD_LOG_DIR/docker_lynis.log
           '''
         }
       }

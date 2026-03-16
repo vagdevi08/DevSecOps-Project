@@ -28,12 +28,19 @@ pipeline {
   }
 
   stages {
-    stage('Checkout') {
-      steps {
-        echo 'Cloning project repo...'
-        git 'https://github.com/vagdevi08/secDevLabs/tree/master/owasp-top10-2017-apps/a7/gossip-world'
-      }
+    stage('Clone Repo') {
+    steps {
+        git branch: 'master', url: 'https://github.com/vagdevi08/secDevLabs.git'
     }
+}
+
+stage('Move to App') {
+    steps {
+        dir('owasp-top10-2017-apps/a7/gossip-world') {
+            sh 'ls -la'
+        }
+    }
+}
 
     stage('Secrets Scan') {
       steps {

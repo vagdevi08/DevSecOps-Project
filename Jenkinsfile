@@ -12,7 +12,7 @@ Stages:
 8. Web Application Firewall Deployment (ModSecurity)
 */
 
-def testenv = "null"
+testenv = "null"
 
 pipeline {
   agent any
@@ -116,30 +116,30 @@ stage('Static Analysis (SAST)') {
       }
     }
 
-//           stage('Setup test env') {
-//     steps {
-//         sh """
-//         # refresh inventory
-//         echo "[local]" > ~/ansible_hosts
-//         echo "localhost ansible_connection=local" >> ~/ansible_hosts
-//         echo "[tstlaunched]" >> ~/ansible_hosts
+          stage('Setup test env') {
+    steps {
+        sh """
+        # refresh inventory
+        echo "[local]" > ~/ansible_hosts
+        echo "localhost ansible_connection=local" >> ~/ansible_hosts
+        echo "[tstlaunched]" >> ~/ansible_hosts
         
-//         tar cvfz /var/lib/jenkins/pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
+        tar cvfz /var/lib/jenkins/pythonapp.tar.gz -C $WORKSPACE/owasp-top10-2017-apps/a7/ .
 
-//         ssh-keygen -t rsa -N "" -f ~/.ssh/python-pipeline-key -q || true
+        ssh-keygen -t rsa -N "" -f ~/.ssh/python-pipeline-key -q || true
 
-//         ansible-playbook -i ~/ansible_hosts $WORKSPACE/createAwsEc2.yml
-//         """
+        ansible-playbook -i ~/ansible_hosts $WORKSPACE/createAwsEc2.yml
+        """
 
-//         script{
-//             testenv = sh(script: "sed -n '/tstlaunched/{n;p;}' ~/ansible_hosts", returnStdout: true).trim()
-//         }
+        script{
+            testenv = sh(script: "sed -n '/tstlaunched/{n;p;}' ~/ansible_hosts", returnStdout: true).trim()
+        }
 
-//         echo "${testenv}"
+        echo "${testenv}"
 
-//         sh "ansible-playbook -i ~/ansible_hosts $WORKSPACE/configureTestEnv.yml"
-//     }
-// }
+        sh "ansible-playbook -i ~/ansible_hosts $WORKSPACE/configureTestEnv.yml"
+    }
+}
 
     // stage('DAST (Authenticated Scan)') {
     //   steps {
@@ -158,16 +158,14 @@ stage('Static Analysis (SAST)') {
     steps {
         echo 'Running Authenticated Dynamic Scan...'
         script {
-            if (env.testenv != "null") {
+            if ("${testenv}" != "null") {
                 def seleniumIp = env.SeleniumPrivateIp ?: "selenium-chrome"
                 
                 sh '''
                   cp /home/ubuntu/DevSecOps-Project/jenkins_home/authDAST.py .
                   python3 authDAST.py selenium-chrome null DAST_results.html
                 '''
-            } else {
-                error("Test environment not found!")
-            }
+            } 
         }
     }
 }

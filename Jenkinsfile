@@ -185,15 +185,15 @@ stage('Static Analysis (SAST)') {
 //     }
 //   }
 
-//   post {
-//     always {
-//       echo 'Pipeline finished. Optionally terminate EC2 instance.'
-//       /*
-//       if (testenv != "null") {
-//         echo "Tearing down test host: ${testenv}"
-//         sh 'ansible-playbook -i $ANSIBLE_HOSTS ~/killec2.yml'
-//       }
-//       */
-//     }
-//   }
-// }
+  post {
+    always {
+      echo 'Pipeline finished. Optionally terminate EC2 instance.'
+      /*
+      if (testenv != "null") {
+        echo "Tearing down test host: ${testenv}"
+        sh 'ansible-playbook -i $ANSIBLE_HOSTS ~/killec2.yml'
+      }
+      */
+    }
+  }
+}

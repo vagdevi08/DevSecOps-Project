@@ -1,94 +1,30 @@
----
-- name: Configure test environment on remote EC2 instances
+# Configure launched instance for test
+- name: Configure instance(s)
   hosts: tstlaunched
-  become: true
+  become: True
   remote_user: ubuntu
-  gather_facts: true
-
-  vars:
-    app_tarball: /home/ubuntu/pythonapp.tar.gz
-    app_directory: /home/ubuntu/gossip-world
-
+  gather_facts: True
   tasks:
-
-    - name: Update package cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
-
-    - name: Remove conflicting containerd
-      apt:
-        name: 
-          - containerd
-          - containerd.io
-        state: absent
-        purge: yes
-
-    - name: Remove old Docker packages
-      apt:
-        name:
-          - docker
-          - docker-engine
-          - docker.io
-          - containerd
-          - containerd.io
-          - runc
-        state: absent
-        purge: yes
-
-    - name: Clean APT cache and remove unused packages
-      apt:
-        autoremove: yes
-        purge: yes
-        update_cache: yes
-
-    - name: Unhold any held packages
-      shell: apt-mark unhold docker.io containerd containerd.io docker-compose || true
-
-    - name: Install Docker prerequisites
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - software-properties-common
-        state: present
-
-    - name: Install required packages
-      apt:
-        name:
-          - docker.io
-          - docker-compose
-          - kbtin
-        state: present
-        update_cache: yes
-        force_apt_get: yes
-
-    - name: Ensure Docker service is running
-      systemd:
-        name: docker
-        state: started
-        enabled: true
-
-    - name: Add ubuntu user to docker group
-      user:
-        name: ubuntu
-        groups: docker
-        append: yes
-
-    - name: Copy the Python app tarball
-      copy:
-        src: /var/lib/jenkins/pythonapp.tar.gz
-        dest: "{{ app_tarball }}"
-        mode: '0644'
-
-    - name: Extract the tarball
-      unarchive:
-        src: "{{ app_tarball }}"
-        dest: /home/ubuntu/
-        remote_src: yes
-
-    - name: Run the application using Makefile
-      make:
-        chdir: "{{ app_directory }}"
-        target: install
+   - name: update package manager
+     apt: update_cache=yes
+   - name: Install docker
+     apt: name=docker.io state=present
+   - name: Install docker-compose
+     apt: name=docker-compose update_cache=yes state=present
+   - name: Install kbtin for lynis to produce html report
+     apt: name=kbtin state=present
+   - name: Install make to build the pythonapp
+     apt: name=make state=present     
+   - name: Copy the zip file of project
+     copy: 
+       src: pythonapp.tar.gz 
+       dest: /home/ubuntu/pythonapp.tar.gz
+   - name: Unzip it
+     unarchive: 
+       src: /home/ubuntu/pythonapp.tar.gz
+       dest: /home/ubuntu/
+       copy: no
+   - name: Run the application with docker
+     shell: make install
+     args:
+       chdir: gossip-world/

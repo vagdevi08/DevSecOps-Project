@@ -31,7 +31,7 @@ pipeline {
     stage('Checkout') {
       steps {
         echo 'Cloning project repo...'
-        git 'https://github.com/vagdevi08/secDevLabs.git'
+        git 'https://github.com/vagdevi08/secDevLabs/tree/master/owasp-top10-2017-apps/a7/gossip-world'
       }
     }
 

@@ -128,7 +128,7 @@ stage('Static Analysis (SAST)') {
 
         ssh-keygen -t rsa -N "" -f ~/.ssh/python-pipeline-key -q || true
 
-        ansible-playbook -i ~/DevSecOps-Project/jenkins_home/ansible_hosts $WORKSPACE/createAwsEc2.yml
+        ansible-playbook -i ~/ansible_hosts $WORKSPACE/createAwsEc2.yml
         """
 
         script{

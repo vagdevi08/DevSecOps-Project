@@ -137,7 +137,7 @@ stage('Static Analysis (SAST)') {
 
         echo "${testenv}"
 
-        sh "ansible-playbook -i ~/ansible_hosts /home/ubuntu/DevSecOps-Project/jenkins_home/configureTestEnv.yml"
+        sh "ansible-playbook -i ~/ansible_hosts $WORKSPACE/configureTestEnv.yml"
     }
 }
 

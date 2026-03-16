@@ -184,6 +184,7 @@ stage('Static Analysis (SAST)') {
 //       }
 //     }
 //   }
+  }
 
   post {
     always {

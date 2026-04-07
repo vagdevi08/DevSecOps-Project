@@ -77,7 +77,4 @@ http://your-jenkins-server:8080/
 
 ![workspace](https://user-images.githubusercontent.com/11514346/71560987-46bd5500-2a68-11ea-8f1f-63c7cf65f631.JPG)
 
-## Authors
-
-* **Pawan Uppadey** - [pawnu](https://github.com/pawnu)
 
